@@ -2,7 +2,7 @@ import lldb
 import shlex
 
 def extract_str(s):
-    return s[s.find('"'):]
+    return s[s.find('"'):].replace("\\n","\n").replace("\\t","\t")
 
 def set_luastate(debugger, name):
     res = lldb.SBCommandReturnObject()
@@ -34,7 +34,7 @@ def luatrace(debugger, command, result, internal_dict):
     assert res.Succeeded(), res.GetError()
     interp.HandleCommand('p lua_tolstring ($L, -1, 0)', res)
     assert res.Succeeded(), res.GetError()
-    print >>result, eval(extract_str(res.GetOutput()))
+    print >>result, extract_str(res.GetOutput())
     interp.HandleCommand('p lua_settop ($L, -2)', res)
 
     assert res.Succeeded(), res.GetError()
